@@ -1,0 +1,10 @@
+title: "Complete Example"
+description: "This example demonstrates a comprehensive setup for a static site using Terraform, including configurations for AWS services such as ACM, Route 53, Lambda, CloudFront, and WAF."
+main_purpose: "The main purpose is to provide a fully functional static site infrastructure with support for custom error responses, DNS management, Lambda integration, caching policies, and WAF configurations."
+key_features:
+  - "**Acm Certificate Management**: Automatically manages ACM certificates for secure HTTPS connections."
+  - "**Custom Error Responses**: Configures custom error responses for the static site."
+  - "**Dns Records Management**: Manages DNS records for the static site, including support for root and alternative zone records."
+  - "**Lambda Integration**: Integrates AWS Lambda functions for custom authentication logic."
+  - "**Caching Policies**: Configures caching behaviors and policies for improved performance and cost efficiency."
+  - "**Waf Configuration**: Provides options for integrating AWS WAF for web application firewall protection."
