@@ -1,5 +1,5 @@
 module_name: Terraform Static Website Module
-module_description: This folder contains the necessary resources to deploy a static site. The module creates a cloud distribution, an S3 bucket to host the static web, and an S3 bucket for logs.
+module_description: This module contains the necessary resources to deploy a static website. The module creates a CloudFront distribution, an S3 bucket to host the static website, and an S3 bucket for logs.
 module_badges:
   - url: "https://github.com/gocloudLa/terraform-aws-wrapper-static-site/releases/latest"
     image: "https://img.shields.io/github/v/release/gocloudLa/terraform-aws-wrapper-static-site.svg?style=for-the-badge"
