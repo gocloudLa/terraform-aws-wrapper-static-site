@@ -33,13 +33,13 @@ static_site_parameters = {
         zone_name    = local.zone_public
         private_zone = false
       }
-      # Para Generar un registro en la RAIZ de la Zona DNS
-      # Utilizar como key _null_ 
+      # To Generate a Record in the ROOT of the DNS Zone
+      # Use _null_ as key
       # "_null_" = {
       #   zone_name    = local.zone_public
       #   private_zone = false
-      # } # Esto genera por Ej. https://example.com
-      # Para generar mismo record en otra zona
+      # } # This Generate for example https://example.com
+      # To Generate the same Record in another zone
       # "_null_-alternative" = {
       #   zone_name    = local.zone_public2
       #   private_zone = false
