@@ -6,7 +6,7 @@ Each module encapsulates best practices, security configurations, and sensible d
 
 ## 📦 Module: Terraform Static Website Module
 <p align="right"><a href="https://github.com/gocloudLa/terraform-aws-wrapper-static-site/releases/latest"><img src="https://img.shields.io/github/v/release/gocloudLa/terraform-aws-wrapper-static-site.svg?style=for-the-badge" alt="Latest Release"/></a><a href=""><img src="https://img.shields.io/github/last-commit/gocloudLa/terraform-aws-wrapper-static-site.svg?style=for-the-badge" alt="Last Commit"/></a><a href="https://registry.terraform.io/modules/gocloudLa/wrapper-static-site/aws"><img src="https://img.shields.io/badge/Terraform-Registry-7B42BC?style=for-the-badge&logo=terraform&logoColor=white" alt="Terraform Registry"/></a></p>
-This folder contains the necessary resources to deploy a static site. The module creates a cloud distribution, an S3 bucket to host the static web, and an S3 bucket for logs.
+This module contains the necessary resources to deploy a static website. The module creates a CloudFront distribution, an S3 bucket to host the static website, and an S3 bucket for logs.
 
 ### ✨ Features
 
