@@ -1,29 +1,4 @@
 locals {
-
-  metadata = var.metadata
-
-  common_name_base = join("-", [
-    local.metadata.key.company,
-    local.metadata.key.env
-  ])
-
-  common_name = join("-", [
-    local.common_name_base,
-    local.metadata.key.project
-  ])
-
-  common_tags = {
-    "company"     = local.metadata.key.company
-    "provisioner" = "terraform"
-    "environment" = local.metadata.environment
-    "project"     = local.metadata.project
-    "created-by"  = "GoCloud.la"
-  }
-
-  /*----------------------------------------------------------------------*/
-  /* Static Site | Locals Definition                                      */
-  /*----------------------------------------------------------------------*/
-
   static_site_aliases = { for resource_name, value1 in var.static_site_parameters : resource_name =>
     [
       for dns_record_name, value2 in value1.dns_records :
