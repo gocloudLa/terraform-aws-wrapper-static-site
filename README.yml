@@ -1,0 +1,120 @@
+module_name: Terraform Static Website Module
+module_description: This module contains the necessary resources to deploy a static website. The module creates a CloudFront distribution, an S3 bucket to host the static website, and an S3 bucket for logs.
+module_badges:
+  - url: "https://github.com/gocloudLa/terraform-aws-wrapper-static-site/releases/latest"
+    image: "https://img.shields.io/github/v/release/gocloudLa/terraform-aws-wrapper-static-site.svg?style=for-the-badge"
+    alt: "Latest Release"
+  - url: ""
+    image: "https://img.shields.io/github/last-commit/gocloudLa/terraform-aws-wrapper-static-site.svg?style=for-the-badge"
+    alt: "Last Commit"
+  - url: "https://registry.terraform.io/modules/gocloudLa/wrapper-static-site/aws"
+    image: "https://img.shields.io/badge/Terraform-Registry-7B42BC?style=for-the-badge&logo=terraform&logoColor=white"
+    alt: "Terraform Registry"
+quick_start: |
+  ```hcl
+  static_site_parameters = {
+    "exsimple" = {
+      acm_certificate_arn   = data.aws_acm_certificate.this.arn
+      custom_error_response = local.custom_error_response
+      # enable_dashboard      = true # Default: false
+      dns_records = {
+        "" = {
+          zone_name    = local.zone_public
+          private_zone = false
+        }
+        # To Generate a Record in the ROOT of the DNS Zone
+        # Use _null_ as key
+        # "_null_" = {
+        #   zone_name    = local.zone_public
+        #   private_zone = false
+        # } # This Generate for example https://example.com
+        # To Generate the same Record in another zone
+        # "_null_-alternative" = {
+        #   zone_name    = local.zone_public2
+        #   private_zone = false
+        #   record_name  = "_null_"
+        # }
+      }
+    }
+    "exlambda" = {
+      acm_certificate_arn   = data.aws_acm_certificate.this.arn
+      custom_error_response = local.custom_error_response
+      dns_records = {
+        "" = {
+          zone_name    = local.zone_public
+          private_zone = false
+        }
+      }
+      lambdas = {
+        "authentication" = {}
+      }
+      default_cache_behavior = {
+        lambda_function_association = {
+          "viewer-request" = {
+            lambda_name  = "authentication"
+            include_body = false
+          }
+        }
+      }
+    }
+  }
+  ```
+features: []
+important_notes: ""
+input_table: |
+  | bucket | Bucket name for the S3 instance | `string` | `"${local.common_name}-${each.key}"` | no |
+  | create_bucket | Whether to create the S3 bucket | `bool` | `true` | no |
+  | acceleration_status | Bucket acceleration status | `string` | `null` | no |
+  | acl | Access control list (ACL) | `string` | `null` | no |
+  | attach_deny_insecure_transport_policy | Attach a policy to deny insecure transport | `bool` | `false` | no |
+  | attach_policy | Attach a custom policy to the S3 bucket | `bool` | `false` | no |
+  | attach_public_policy | Attach a public policy to the S3 bucket | `bool` | `true` | no |
+  | attach_require_latest_tls_policy | Attach a policy requiring the latest TLS version | `bool` | `false` | no |
+  | block_public_acls | Block public ACLs on the bucket | `bool` | `true` | no |
+  | block_public_policy | Block public policies on the bucket | `bool` | `true` | no |
+  | control_object_ownership | Enable control over object ownership | `bool` | `false` | no |
+  | cors_rule | CORS rule for the bucket | `list` | `[]` | no |
+  | expected_bucket_owner | Expected bucket owner ID | `string` | `null` | no |
+  | force_destroy | Force bucket destruction on Terraform destroy | `bool` | `true` | no |
+  | ignore_public_acls | Ignore public ACLs for the bucket | `bool` | `true` | no |
+  | intelligent_tiering | Intelligent tiering configuration | `map` | `{}` | no |
+  | lifecycle_rule | Lifecycle rules for the bucket | `list` | `[]` | no |
+  | logging | Logging configuration for the S3 bucket | `map` | `{}` | no |
+  | metric_configuration | Metrics configuration for the bucket | `list` | `[]` | no |
+  | object_lock_configuration | Object lock configuration | `map` | `{}` | no |
+  | object_lock_enabled | Enable object lock for the bucket | `bool` | `false` | no |
+  | object_ownership | Object ownership setting | `string` | `"ObjectWriter"` | no |
+  | policy | Custom policy for the bucket | `string` | `null` | no |
+  | replication_configuration | Replication configuration for the bucket | `map` | `{}` | no |
+  | request_payer | Request payer for bucket transactions | `string` | `null` | no |
+  | restrict_public_buckets | Restrict public bucket access | `bool` | `true` | no |
+  | server_side_encryption_configuration | Server-side encryption configuration for the bucket | `map` | `{}` | no |
+  | versioning | Versioning configuration for the bucket | `map` | `{}` | no |
+  | website | Website hosting configuration for the bucket | `map` | `{}` | no |
+  | create_log_bucket | Whether to create a log bucket | `bool` | `true` | no |
+  | create_distribution | Whether to create a CloudFront distribution | `bool` | `true` | no |
+  | create_origin_access_identity | Whether to create an Origin Access Identity for CloudFront | `bool` | `true` | no |
+  | origin_access_identities | Origin access identities for the CloudFront distribution | `map` | `{"${local.common_name}-${each.key}": "Application S3 Bucket"}` | no |
+  | aliases | Aliases for the CloudFront distribution | `list` | `null` | no |
+  | comment | Comment for the CloudFront distribution | `string` | `"${local.common_name}-${each.key}"` | no |
+  | default_root_object | Default root object for the CloudFront distribution | `string` | `"index.html"` | no |
+  | enabled | Enable the CloudFront distribution | `bool` | `true` | no |
+  | http_version | HTTP version for the CloudFront distribution | `string` | `"http2"` | no |
+  | is_ipv6_enabled | Enable IPv6 for the CloudFront distribution | `bool` | `true` | no |
+  | price_class | Price class for the CloudFront distribution | `string` | `"PriceClass_100"` | no |
+  | retain_on_delete | Retain the CloudFront distribution on resource deletion | `bool` | `false` | no |
+  | wait_for_deployment | Wait for CloudFront distribution deployment | `bool` | `false` | no |
+  | web_acl_id | Web ACL ID for the CloudFront distribution | `string` | `null` | no |
+  | origin | Origin settings for the CloudFront distribution | `map` | `{}` | no |
+  | origin_group | Origin group settings for the CloudFront distribution | `map` | `{}` | no |
+  | viewer_certificate | Viewer certificate configuration for the CloudFront distribution | `map` | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2019"}` | no |
+  | geo_restriction | Geo restriction settings for the CloudFront distribution | `map` | `{}` | no |
+  | logging_config | Logging configuration for the CloudFront distribution | `map` | `{}` | no |
+  | custom_error_response | Custom error responses for the CloudFront distribution | `map` | `{}` | no |
+  | default_cache_behavior | Default cache behavior settings for the CloudFront distribution | `map` | `local.default_cache_behavior[each.key]` | no |
+  | ordered_cache_behavior | Ordered cache behavior settings for the CloudFront distribution | `map` | `local.ordered_cache_behavior[each.key]` | no |
+  | create_monitoring_subscription | Whether to create a monitoring subscription for CloudFront | `bool` | `true` | no |
+  | realtime_metrics_subscription_status | Status of real-time metrics subscription for CloudFront | `string` | `"Enabled"` | no |
+  | acm_certificate_arn | ACM certificate ARN for the CloudFront distribution | `string` | `null` | no |
+  | enable_dashboard | Whether to enable a dashboard for CloudFront | `bool` | `false` | no |
+  | tags | A map of tags to assign to resources. | `map` | `{}` | no |
