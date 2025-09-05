@@ -71,7 +71,7 @@ module "static-site" {
 
   enable_dashboard = try(each.value.enable_dashboard, var.static_site_defaults.enable_dashboard, false)
 
-  tags = merge(local.common_tags, { workload = "${each.key}" })
+  tags = merge(local.common_tags, { workload = "${each.key}" }, try(each.value.tags, var.static_site_defaults.tags, null))
 
   providers = {
     aws.use1 = aws.use1
