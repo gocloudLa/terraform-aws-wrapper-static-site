@@ -134,6 +134,7 @@ static_site_parameters = {
 | realtime_metrics_subscription_status  | Status of real-time metrics subscription for CloudFront          | `string` | `"Enabled"`                                                                                                                             | no       |
 | acm_certificate_arn                   | ACM certificate ARN for the CloudFront distribution              | `string` | `null`                                                                                                                                  | no       |
 | enable_dashboard                      | Whether to enable a dashboard for CloudFront                     | `bool`   | `false`                                                                                                                                 | no       |
+| tags                                  | A map of tags to assign to resources.                            | `map`    | `{}`                                                                                                                                    | no       |
 
 
 
