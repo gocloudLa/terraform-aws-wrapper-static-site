@@ -52,7 +52,7 @@ module "cloudfront" {
 
 module "app_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
+  version = "5.7.0"
 
   bucket               = var.bucket
   force_destroy        = var.force_destroy
@@ -71,7 +71,7 @@ module "app_bucket" {
 
 module "cloudfront_log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.2.0"
+  version = "5.7.0"
 
   create_bucket           = var.create_log_bucket
   bucket                  = "${var.bucket}-cloudfront-logs"
