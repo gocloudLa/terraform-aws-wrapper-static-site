@@ -32,7 +32,6 @@ module "static-site" {
   server_side_encryption_configuration  = try(each.value.server_side_encryption_configuration, var.static_site_defaults.server_side_encryption_configuration, {})
   versioning                            = try(each.value.versioning, var.static_site_defaults.versioning, {})
   website                               = try(each.value.website, var.static_site_defaults.website, {})
-  skip_destroy_public_access_block      = try(each.value.skip_destroy_public_access_block, var.static_site_defaults.skip_destroy_public_access_block, true)
 
   create_log_bucket = try(each.value.create_log_bucket, var.static_site_defaults.create_log_bucket, true)
 

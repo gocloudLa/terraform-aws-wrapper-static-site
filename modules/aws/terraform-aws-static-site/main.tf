@@ -58,10 +58,11 @@ module "app_bucket" {
   force_destroy        = var.force_destroy
   metric_configuration = local.metric_configuration
 
-  block_public_acls       = var.block_public_acls
-  block_public_policy     = var.block_public_policy
-  ignore_public_acls      = var.ignore_public_acls
-  restrict_public_buckets = var.restrict_public_buckets
+  block_public_acls                = var.block_public_acls
+  block_public_policy              = var.block_public_policy
+  ignore_public_acls               = var.ignore_public_acls
+  restrict_public_buckets          = var.restrict_public_buckets
+  skip_destroy_public_access_block = var.skip_destroy_public_access_block
 
   policy    = var.policy
   cors_rule = var.cors_rule
