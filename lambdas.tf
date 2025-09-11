@@ -4,7 +4,7 @@
 module "static_site_lambdas" {
   for_each = local.static_site_lambdas
   source   = "terraform-aws-modules/lambda/aws"
-  version  = "8.0.1"
+  version  = "8.1.0"
 
   lambda_at_edge = true
 

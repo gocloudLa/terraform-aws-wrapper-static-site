@@ -87,7 +87,6 @@ input_table: |
   | policy | Custom policy for the bucket | `string` | `null` | no |
   | replication_configuration | Replication configuration for the bucket | `map` | `{}` | no |
   | request_payer | Request payer for bucket transactions | `string` | `null` | no |
-  | restrict_public_buckets | Restrict public bucket access | `bool` | `true` | no |
   | server_side_encryption_configuration | Server-side encryption configuration for the bucket | `map` | `{}` | no |
   | versioning | Versioning configuration for the bucket | `map` | `{}` | no |
   | website | Website hosting configuration for the bucket | `map` | `{}` | no |
