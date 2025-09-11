@@ -92,7 +92,6 @@ input_table: |
   | versioning | Versioning configuration for the bucket | `map` | `{}` | no |
   | website | Website hosting configuration for the bucket | `map` | `{}` | no |
   | create_log_bucket | Whether to create a log bucket | `bool` | `true` | no |
-  | skip_destroy_public_access_block | Whether to skip destroying the S3 Bucket Public Access Block configuration when destroying the bucket. Only used if `public_access_block` is set to true. | `bool` | `true` | no |
   | create_distribution | Whether to create a CloudFront distribution | `bool` | `true` | no |
   | create_origin_access_identity | Whether to create an Origin Access Identity for CloudFront | `bool` | `true` | no |
   | origin_access_identities | Origin access identities for the CloudFront distribution | `map` | `{"${local.common_name}-${each.key}": "Application S3 Bucket"}` | no |
