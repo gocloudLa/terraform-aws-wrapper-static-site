@@ -32,9 +32,9 @@ module "static-site" {
   server_side_encryption_configuration  = try(each.value.server_side_encryption_configuration, var.static_site_defaults.server_side_encryption_configuration, {})
   versioning                            = try(each.value.versioning, var.static_site_defaults.versioning, {})
   website                               = try(each.value.website, var.static_site_defaults.website, {})
-
-  create_log_bucket = try(each.value.create_bucket, var.static_site_defaults.create_bucket, true)
-
+  create_log_bucket                     = try(each.value.create_bucket, var.static_site_defaults.create_bucket, true)
+  skip_destroy_public_access_block      = try(each.value.skip_destroy_public_access_block, var.defaults.skip_destroy_public_access_block, true)
+  
   # cloudfront variables
   create_distribution           = try(each.value.create_distribution, var.static_site_defaults.create_distribution, true)
   create_origin_access_identity = try(each.value.create_origin_access_identity, var.static_site_defaults.create_origin_access_identity, true)

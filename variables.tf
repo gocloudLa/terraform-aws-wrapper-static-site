@@ -21,3 +21,9 @@ variable "static_site_defaults" {
   type        = any
   default     = {}
 }
+
+variable "skip_destroy_public_access_block" {
+  description = "Whether to skip destroying the S3 Bucket Public Access Block configuration when destroying the bucket. Only used if `public_access_block` is set to true."
+  type        = bool
+  default     = true
+}
