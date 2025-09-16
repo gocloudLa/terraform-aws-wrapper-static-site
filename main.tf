@@ -33,7 +33,7 @@ module "static-site" {
   versioning                            = try(each.value.versioning, var.static_site_defaults.versioning, {})
   website                               = try(each.value.website, var.static_site_defaults.website, {})
 
-  create_log_bucket = try(each.value.create_bucket, var.static_site_defaults.create_bucket, true)
+  create_log_bucket = try(each.value.create_log_bucket, var.static_site_defaults.create_log_bucket, true)
 
   # cloudfront variables
   create_distribution           = try(each.value.create_distribution, var.static_site_defaults.create_distribution, true)
