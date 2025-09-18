@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.0...v1.0.1) (2025-09-18)
+
+
+### Bug Fixes
+
+* **terraform:** external modules upgrade 20250910 ([951a04c](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/commit/951a04c01491d8996c8ac3f5d5546f48acf0b85a))
+
 ## 1.0.0 (2025-09-05)
 
 
