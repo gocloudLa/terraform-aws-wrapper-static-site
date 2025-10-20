@@ -17,7 +17,7 @@ This module contains the necessary resources to deploy a static website. The mod
 |------|------:|
 | <a href="https://github.com/terraform-aws-modules/terraform-aws-cloudfront" target="_blank">terraform-aws-modules/cloudfront/aws</a> | 5.0.0 |
 | <a href="https://github.com/terraform-aws-modules/terraform-aws-lambda" target="_blank">terraform-aws-modules/lambda/aws</a> | 8.1.0 |
-| <a href="https://github.com/terraform-aws-modules/terraform-aws-s3-bucket" target="_blank">terraform-aws-modules/s3-bucket/aws</a> | 5.7.0 |
+| <a href="https://github.com/terraform-aws-modules/terraform-aws-s3-bucket" target="_blank">terraform-aws-modules/s3-bucket/aws</a> | 5.8.1 |
 
 
 
