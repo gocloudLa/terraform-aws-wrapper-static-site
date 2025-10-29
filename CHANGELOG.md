@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.1...v1.0.2) (2025-10-29)
+
+
+### Bug Fixes
+
+* **deps:** bump the all-terraform-dependencies group across 2 directories with 3 updates ([#7](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/issues/7)) ([65c72a2](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/commit/65c72a29dd73590c14bb3731c6161d8b6d6557b3))
+
 ## [1.0.1](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.0...v1.0.1) (2025-09-18)
 
 
