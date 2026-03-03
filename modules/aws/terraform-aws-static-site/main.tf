@@ -20,7 +20,7 @@ module "cloudfront" {
 
   custom_error_response = var.custom_error_response
   viewer_certificate    = var.viewer_certificate
-  geo_restriction       = var.geo_restriction
+  restrictions          = var.restrictions
 
 
   logging_config = {

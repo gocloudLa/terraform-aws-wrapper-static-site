@@ -80,9 +80,11 @@ module "static-site" {
           origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-AllViewer
         }
       ]
-      geo_restriction = {
-        restriction_type = "whitelist"
-        locations        = ["AR"]
+      restrictions = {
+        geo_restriction = {
+          restriction_type = "whitelist" 
+          locations        = ["AR"]
+        }
       }
     }
     "exwaf" = {

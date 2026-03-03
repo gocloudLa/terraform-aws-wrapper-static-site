@@ -94,7 +94,7 @@ variable "viewer_certificate" {
   }
 }
 
-variable "geo_restriction" {
+variable "restrictions" {
   description = "The restriction configuration for this distribution (geo_restrictions)"
   type        = any
   default     = {}

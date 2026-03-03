@@ -54,7 +54,12 @@ module "static-site" {
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2019"
   })
-  geo_restriction        = try(each.value.geo_restriction, var.static_site_defaults.geo_restriction, {})
+  restrictions        = try(each.value.restrictions, var.static_site_defaults.restrictions, {
+    geo_restriction = {
+      restriction_type = "none"
+      locations        = []
+    }
+  })
   logging_config         = try(each.value.logging_config, var.static_site_defaults.logging_config, {})
   custom_error_response  = try(each.value.custom_error_response, var.static_site_defaults.custom_error_response, {})
   default_cache_behavior = local.default_cache_behavior[each.key]
