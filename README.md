@@ -108,9 +108,7 @@ static_site_parameters = {
 | versioning                            | Versioning configuration for the bucket                          | `map`    | `{}`                                                                                                                                    | no       |
 | website                               | Website hosting configuration for the bucket                     | `map`    | `{}`                                                                                                                                    | no       |
 | create_log_bucket                     | Whether to create a log bucket                                   | `bool`   | `true`                                                                                                                                  | no       |
-| create_distribution                   | Whether to create a CloudFront distribution                      | `bool`   | `true`                                                                                                                                  | no       |
-| create_origin_access_identity         | Whether to create an Origin Access Identity for CloudFront       | `bool`   | `true`                                                                                                                                  | no       |
-| origin_access_identities              | Origin access identities for the CloudFront distribution         | `map`    | `{"${local.common_name}-${each.key}": "Application S3 Bucket"}`                                                                         | no       |
+| create                                | Whether to create a CloudFront distribution                      | `bool`   | `true`                                                                                                                                  | no       |
 | aliases                               | Aliases for the CloudFront distribution                          | `list`   | `null`                                                                                                                                  | no       |
 | comment                               | Comment for the CloudFront distribution                          | `string` | `"${local.common_name}-${each.key}"`                                                                                                    | no       |
 | default_root_object                   | Default root object for the CloudFront distribution              | `string` | `"index.html"`                                                                                                                          | no       |
@@ -122,9 +120,9 @@ static_site_parameters = {
 | wait_for_deployment                   | Wait for CloudFront distribution deployment                      | `bool`   | `false`                                                                                                                                 | no       |
 | web_acl_id                            | Web ACL ID for the CloudFront distribution                       | `string` | `null`                                                                                                                                  | no       |
 | origin                                | Origin settings for the CloudFront distribution                  | `map`    | `{}`                                                                                                                                    | no       |
-| origin_group                          | Origin group settings for the CloudFront distribution            | `map`    | `{}`                                                                                                                                    | no       |
-| viewer_certificate                    | Viewer certificate configuration for the CloudFront distribution | `map`    | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2019"}` | no       |
-| geo_restriction                       | Geo restriction settings for the CloudFront distribution         | `map`    | `{}`                                                                                                                                    | no       |
+| origin_group                          | Origin group settings for the CloudFront distribution            | `map`    | `null`                                                                                                                                  | no       |
+| viewer_certificate                    | Viewer certificate configuration for the CloudFront distribution | `map`    | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2025"}` | no       |
+| restrictions                          | Restriction configuration for the CloudFront distribution        | `map`    | `{"geo_restriction":{"restriction_type":"none","locations":[]}}`                                                                        | no       |
 | logging_config                        | Logging configuration for the CloudFront distribution            | `map`    | `{}`                                                                                                                                    | no       |
 | custom_error_response                 | Custom error responses for the CloudFront distribution           | `map`    | `{}`                                                                                                                                    | no       |
 | default_cache_behavior                | Default cache behavior settings for the CloudFront distribution  | `map`    | `local.default_cache_behavior[each.key]`                                                                                                | no       |
@@ -139,6 +137,12 @@ static_site_parameters = {
 
 
 
+
+
+## ⚠️ Important Notes
+- CloudFront access to the S3 origin now uses Origin Access Control (OAC) instead of Origin Access Identity (OAI).
+- The S3 bucket policy for static content now authorizes `cloudfront.amazonaws.com` with `AWS:SourceArn` set to the CloudFront distribution ARN.
+- CloudFront geo restrictions are configured through the `restrictions` input (using the nested `geo_restriction` block).
 
 
 
