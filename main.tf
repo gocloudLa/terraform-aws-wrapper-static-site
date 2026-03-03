@@ -54,7 +54,7 @@ module "static-site" {
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2025"
   })
-  restrictions        = try(each.value.restrictions, var.static_site_defaults.restrictions, {
+  restrictions = try(each.value.restrictions, var.static_site_defaults.restrictions, {
     geo_restriction = {
       restriction_type = "none"
       locations        = []

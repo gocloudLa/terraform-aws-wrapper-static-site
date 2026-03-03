@@ -82,7 +82,7 @@ module "static-site" {
       ]
       restrictions = {
         geo_restriction = {
-          restriction_type = "whitelist" 
+          restriction_type = "whitelist"
           locations        = ["AR"]
         }
       }
