@@ -1,7 +1,7 @@
 /*----------------------------------------------------------------------*/
 /* Cloudfront | Variable Definition                                    */
 /*----------------------------------------------------------------------*/
-variable "create_distribution" {
+variable "create" {
   description = "Controls if CloudFront distribution should be created"
   type        = bool
   default     = true

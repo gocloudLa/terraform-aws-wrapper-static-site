@@ -36,8 +36,7 @@ module "static-site" {
   create_log_bucket = try(each.value.create_log_bucket, var.static_site_defaults.create_log_bucket, true)
 
   # Cloudfront variables
-  create_distribution              = try(each.value.create_distribution, var.static_site_defaults.create_distribution, true)
-  
+  create              = try(each.value.create, var.static_site_defaults.create, true)
   aliases             = try(each.value.aliases, local.static_site_aliases[each.key], null)
   comment             = try(each.value.comment, var.static_site_defaults.comment, "${local.common_name}-${each.key}")
   default_root_object = try(each.value.default_root_object, var.static_site_defaults.default_root_object, "index.html")
