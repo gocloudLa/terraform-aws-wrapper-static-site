@@ -7,18 +7,6 @@ variable "create_distribution" {
   default     = true
 }
 
-variable "create_origin_access_identity" {
-  description = "Controls if CloudFront origin access identity should be created"
-  type        = bool
-  default     = false
-}
-
-variable "origin_access_identities" {
-  description = "Map of CloudFront origin access identities (value as a comment)"
-  type        = map(string)
-  default     = {}
-}
-
 variable "aliases" {
   description = "Extra CNAMEs (alternate domain names), if any, for this distribution."
   type        = list(string)

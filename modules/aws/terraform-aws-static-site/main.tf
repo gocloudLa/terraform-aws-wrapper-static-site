@@ -15,7 +15,6 @@ module "cloudfront" {
   # This rate is charged only once per month, per metric (up to 8 metrics per distribution).
   create_monitoring_subscription = var.create_monitoring_subscription //true
 
-  create_origin_access_identity = var.create_origin_access_identity //true
 
   default_root_object = var.default_root_object
 
@@ -23,7 +22,6 @@ module "cloudfront" {
   viewer_certificate    = var.viewer_certificate
   geo_restriction       = var.geo_restriction
 
-  origin_access_identities = var.origin_access_identities
 
   logging_config = {
     bucket = module.cloudfront_log_bucket.s3_bucket_bucket_domain_name

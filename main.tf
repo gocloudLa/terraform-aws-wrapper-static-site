@@ -35,12 +35,9 @@ module "static-site" {
 
   create_log_bucket = try(each.value.create_log_bucket, var.static_site_defaults.create_log_bucket, true)
 
-  # cloudfront variables
-  create_distribution           = try(each.value.create_distribution, var.static_site_defaults.create_distribution, true)
-  create_origin_access_identity = try(each.value.create_origin_access_identity, var.static_site_defaults.create_origin_access_identity, true)
-  origin_access_identities = try(each.value.origin_access_identities, var.static_site_defaults.origin_access_identities, {
-    "${local.common_name}-${each.key}" = "Application S3 Bucket"
-  })
+  # Cloudfront variables
+  create_distribution              = try(each.value.create_distribution, var.static_site_defaults.create_distribution, true)
+  
   aliases             = try(each.value.aliases, local.static_site_aliases[each.key], null)
   comment             = try(each.value.comment, var.static_site_defaults.comment, "${local.common_name}-${each.key}")
   default_root_object = try(each.value.default_root_object, var.static_site_defaults.default_root_object, "index.html")
