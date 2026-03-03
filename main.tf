@@ -36,19 +36,22 @@ module "static-site" {
   create_log_bucket = try(each.value.create_log_bucket, var.static_site_defaults.create_log_bucket, true)
 
   # Cloudfront variables
-  create              = try(each.value.create, var.static_site_defaults.create, true)
-  aliases             = try(each.value.aliases, local.static_site_aliases[each.key], null)
-  comment             = try(each.value.comment, var.static_site_defaults.comment, "${local.common_name}-${each.key}")
-  default_root_object = try(each.value.default_root_object, var.static_site_defaults.default_root_object, "index.html")
-  enabled             = try(each.value.enabled, var.static_site_defaults.enabled, true)
-  http_version        = try(each.value.http_version, var.static_site_defaults.http_version, "http2")
-  is_ipv6_enabled     = try(each.value.is_ipv6_enabled, var.static_site_defaults.is_ipv6_enabled, true)
-  price_class         = try(each.value.price_class, var.static_site_defaults.price_class, "PriceClass_100")
-  retain_on_delete    = try(each.value.retain_on_delete, var.static_site_defaults.retain_on_delete, false)
-  wait_for_deployment = try(each.value.wait_for_deployment, var.static_site_defaults.wait_for_deployment, false)
-  web_acl_id          = try(each.value.web_acl_id, var.static_site_defaults.web_acl_id, null)
-  origin              = try(each.value.origin, var.static_site_defaults.origin, {})
-  origin_group        = try(each.value.origin_group, var.static_site_defaults.origin_group, {})
+  create                    = try(each.value.create, var.static_site_defaults.create, true)
+  aliases                   = try(each.value.aliases, local.static_site_aliases[each.key], null)
+  comment                   = try(each.value.comment, var.static_site_defaults.comment, "${local.common_name}-${each.key}")
+  default_root_object       = try(each.value.default_root_object, var.static_site_defaults.default_root_object, "index.html")
+  enabled                   = try(each.value.enabled, var.static_site_defaults.enabled, true)
+  http_version              = try(each.value.http_version, var.static_site_defaults.http_version, "http2")
+  is_ipv6_enabled           = try(each.value.is_ipv6_enabled, var.static_site_defaults.is_ipv6_enabled, true)
+  price_class               = try(each.value.price_class, var.static_site_defaults.price_class, "PriceClass_100")
+  retain_on_delete          = try(each.value.retain_on_delete, var.static_site_defaults.retain_on_delete, false)
+  staging                   = try(each.value.staging, var.static_site_defaults.staging, null)
+  wait_for_deployment       = try(each.value.wait_for_deployment, var.static_site_defaults.wait_for_deployment, false)
+  web_acl_id                = try(each.value.web_acl_id, var.static_site_defaults.web_acl_id, null)
+  origin                    = try(each.value.origin, var.static_site_defaults.origin, {})
+  origin_group              = try(each.value.origin_group, var.static_site_defaults.origin_group, {})
+  response_headers_policies = try(each.value.response_headers_policies, var.static_site_defaults.response_headers_policies, null)
+  cloudfront_functions      = try(each.value.cloudfront_functions, var.static_site_defaults.cloudfront_functions, null)
   viewer_certificate = try(each.value.viewer_certificate, var.static_site_defaults.viewer_certificate, {
     acm_certificate_arn      = each.value.acm_certificate_arn
     ssl_support_method       = "sni-only"
@@ -57,7 +60,6 @@ module "static-site" {
   restrictions = try(each.value.restrictions, var.static_site_defaults.restrictions, {
     geo_restriction = {
       restriction_type = "none"
-      locations        = []
     }
   })
   logging_config         = try(each.value.logging_config, var.static_site_defaults.logging_config, {})

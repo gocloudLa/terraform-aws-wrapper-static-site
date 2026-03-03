@@ -32,7 +32,7 @@ variable "enabled" {
 }
 
 variable "http_version" {
-  description = "The maximum HTTP version to support on the distribution. Allowed values are http1.1 and http2. The default is http2."
+  description = "The maximum HTTP version to support on the distribution. Allowed values are http1.1, http2, http2and3, and http3. The default is http2."
   type        = string
   default     = "http2"
 }
@@ -53,6 +53,12 @@ variable "retain_on_delete" {
   description = "Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards."
   type        = bool
   default     = false
+}
+
+variable "staging" {
+  description = "Whether the distribution is a staging distribution (for blue/green or preview)."
+  type        = bool
+  default     = null
 }
 
 variable "wait_for_deployment" {
@@ -128,6 +134,18 @@ variable "create_monitoring_subscription" {
   description = "If enabled, the resource for monitoring subscription will created."
   type        = bool
   default     = false
+}
+
+variable "response_headers_policies" {
+  description = "Map of CloudFront response headers policies (CORS, security headers, etc.)."
+  type        = any
+  default     = null
+}
+
+variable "cloudfront_functions" {
+  description = "Map of CloudFront Function configurations (key used as default function name if 'name' not specified)."
+  type        = any
+  default     = null
 }
 
 variable "realtime_metrics_subscription_status" {

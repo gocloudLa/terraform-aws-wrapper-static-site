@@ -2,25 +2,31 @@ module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "6.4.0"
 
+  create              = var.create
   aliases             = var.aliases
   comment             = var.comment
   enabled             = var.enabled
-  is_ipv6_enabled     = var.is_ipv6_enabled     //True
-  price_class         = var.price_class         //"PriceClass_100"
-  retain_on_delete    = var.retain_on_delete    //false
-  wait_for_deployment = var.wait_for_deployment //false
+  http_version        = var.http_version
+  is_ipv6_enabled     = var.is_ipv6_enabled
+  price_class         = var.price_class
+  retain_on_delete    = var.retain_on_delete
+  staging             = var.staging
+  wait_for_deployment = var.wait_for_deployment
   web_acl_id          = var.web_acl_id
 
   # When you enable additional metrics for a distribution, CloudFront sends up to 8 metrics to CloudWatch in the US East (N. Virginia) Region.
   # This rate is charged only once per month, per metric (up to 8 metrics per distribution).
-  create_monitoring_subscription = var.create_monitoring_subscription //true
-
+  create_monitoring_subscription       = var.create_monitoring_subscription
+  realtime_metrics_subscription_status = var.realtime_metrics_subscription_status
 
   default_root_object = var.default_root_object
 
-  custom_error_response = var.custom_error_response
-  viewer_certificate    = var.viewer_certificate
-  restrictions          = var.restrictions
+  custom_error_response     = var.custom_error_response
+  viewer_certificate        = var.viewer_certificate
+  restrictions              = var.restrictions
+  response_headers_policies = var.response_headers_policies
+  cloudfront_functions      = var.cloudfront_functions
+  origin_group              = var.origin_group
 
 
   logging_config = {

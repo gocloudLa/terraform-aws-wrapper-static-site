@@ -103,12 +103,15 @@ input_table: |
   | is_ipv6_enabled | Enable IPv6 for the CloudFront distribution | `bool` | `true` | no |
   | price_class | Price class for the CloudFront distribution | `string` | `"PriceClass_100"` | no |
   | retain_on_delete | Retain the CloudFront distribution on resource deletion | `bool` | `false` | no |
+  | staging | Whether the CloudFront distribution is a staging distribution (blue/green, preview) | `bool` | `null` | no |
   | wait_for_deployment | Wait for CloudFront distribution deployment | `bool` | `false` | no |
   | web_acl_id | Web ACL ID for the CloudFront distribution | `string` | `null` | no |
   | origin | Origin settings for the CloudFront distribution | `map` | `{}` | no |
   | origin_group | Origin group settings for the CloudFront distribution | `map` | `null` | no |
   | viewer_certificate | Viewer certificate configuration for the CloudFront distribution | `map` | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2025"}` | no |
   | restrictions | Restriction configuration for the CloudFront distribution | `map` | `{"geo_restriction":{"restriction_type":"none","locations":[]}}` | no |
+  | response_headers_policies | Map of CloudFront response headers policies (CORS, security headers, etc.) | `any` | `null` | no |
+  | cloudfront_functions | Map of CloudFront Function configurations (redirects, edge logic) | `any` | `null` | no |
   | logging_config | Logging configuration for the CloudFront distribution | `map` | `{}` | no |
   | custom_error_response | Custom error responses for the CloudFront distribution | `map` | `{}` | no |
   | default_cache_behavior | Default cache behavior settings for the CloudFront distribution | `map` | `local.default_cache_behavior[each.key]` | no |
