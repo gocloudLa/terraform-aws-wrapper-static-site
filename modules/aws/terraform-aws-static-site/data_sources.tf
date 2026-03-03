@@ -8,8 +8,14 @@ data "aws_iam_policy_document" "s3_policy" {
     resources = ["${module.app_bucket.s3_bucket_arn}/*"]
 
     principals {
-      type        = "AWS"
-      identifiers = module.cloudfront.cloudfront_origin_access_identity_iam_arns
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [module.cloudfront.cloudfront_distribution_arn]
     }
   }
 }
