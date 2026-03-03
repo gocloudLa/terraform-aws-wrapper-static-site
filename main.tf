@@ -52,7 +52,7 @@ module "static-site" {
   viewer_certificate = try(each.value.viewer_certificate, var.static_site_defaults.viewer_certificate, {
     acm_certificate_arn      = each.value.acm_certificate_arn
     ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2019"
+    minimum_protocol_version = "TLSv1.2_2025"
   })
   restrictions        = try(each.value.restrictions, var.static_site_defaults.restrictions, {
     geo_restriction = {
