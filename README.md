@@ -10,6 +10,16 @@ This module contains the necessary resources to deploy a static website. The mod
 
 ### ✨ Features
 
+- 📋 [Response Headers Policies](#response-headers-policies) - Define CORS, security headers, custom headers and attach them per cache behavior
+
+- 🌐 [DNS Records](#dns-records) - Create Route53 A (alias) records pointing to the CloudFront distribution
+
+- ⚡ [Lambda@Edge](#lambda@edge) - Attach Lambda functions to CloudFront viewer-request or viewer-response
+
+- 🛡️ [WAF (Web ACL)](#waf-(web-acl)) - Attach an AWS WAF Web ACL to the CloudFront distribution
+
+- 📜 [CloudFront access logs](#cloudfront-access-logs) - S3 bucket for CloudFront access logs
+
 
 
 ### 🔗 External Modules
@@ -73,6 +83,112 @@ static_site_parameters = {
 
 
 ## 🔧 Additional Features Usage
+
+### Response Headers Policies
+Create multiple CloudFront response headers policies (CORS, security headers, custom or remove headers) and attach them to the default or ordered cache behaviors using `response_headers_policy_key`. Use the same key as in the `response_headers_policies` map.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+response_headers_policies = {
+  cors_policy = {
+    name = "CORSPolicy"
+    comment = "CORS for API"
+    cors_config = {
+      access_control_allow_credentials = true
+      origin_override                  = true
+      access_control_allow_headers     = { items = ["*"] }
+      access_control_allow_methods    = { items = ["GET", "POST", "OPTIONS"] }
+      access_control_allow_origins    = { items = ["https://example.com"] }
+      access_control_max_age_sec      = 3600
+    }
+  }
+  custom_security_headers = {
+    name    = "security-headers"
+    comment = "Security headers"
+    security_headers_config = {
+      content_type_options = { override = true }
+      frame_options       = { frame_option = "SAMEORIGIN", override = true }
+      strict_transport_security = { access_control_max_age_sec = 31536000, override = true, preload = true }
+    }
+  }
+}
+# Attach to a cache behavior:
+default_cache_behavior = { response_headers_policy_key = "custom_security_headers" }
+ordered_cache_behavior = [{ path_pattern = "/api/*", response_headers_policy_key = "cors_policy" }]
+```
+
+
+</details>
+
+
+### DNS Records
+Register A records (alias to CloudFront) in Route53 hosted zones. Use key `""` for subdomain matching the site name, or `"_null_"` for the zone apex (e.g. example.com).
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+dns_records = {
+  "" = {
+    zone_name    = local.zone_public
+    private_zone = false
+  }
+  # Apex record (e.g. https://example.com)
+  "_null_" = {
+    zone_name    = local.zone_public
+    private_zone = false
+  }
+}
+```
+
+
+</details>
+
+
+### Lambda@Edge
+Define Lambdas in the module and associate them to the default or ordered cache behaviors via `lambda_function_association`, with optional `include_body` for viewer-request.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+lambdas = {
+  "authentication" = {}
+}
+default_cache_behavior = {
+  lambda_function_association = {
+    "viewer-request" = {
+      lambda_name  = "authentication"
+      include_body = false
+    }
+  }
+}
+```
+
+
+</details>
+
+
+### WAF (Web ACL)
+Associate a WAF Web ACL to protect the static site. For WAFv2 use the ARN of the Web ACL. The Web ACL must exist in the CloudFront (global) scope.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+web_acl_id = data.aws_wafv2_web_acl.cloudfront.arn
+```
+
+
+</details>
+
+
+### CloudFront access logs
+The module creates an S3 bucket for CloudFront access logs by default. Configure `create_log_bucket` and optional overrides via `logging_config` if you need a custom destination.
+
+
 
 
 
