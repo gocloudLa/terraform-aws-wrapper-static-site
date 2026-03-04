@@ -18,7 +18,7 @@ module "static_site_lambdas" {
 
   ignore_source_code_hash      = true
   trigger_on_package_timestamp = false
-  
+
   memory_size                       = try(each.value.memory_size, 128)
   ephemeral_storage_size            = try(each.value.ephemeral_storage_size, 512)
   provisioned_concurrent_executions = try(each.value.provisioned_concurrent_executions, -1)
