@@ -32,10 +32,12 @@ locals {
       compress               = try(value.default_cache_behavior.compress, local.cache_behavior_default.compress)
       query_string           = try(value.default_cache_behavior.query_string, local.cache_behavior_default.query_string)
       # Cache key and origin requests
-      use_forwarded_values       = try(value.default_cache_behavior.use_forwarded_values, local.cache_behavior_default.use_forwarded_values)
-      cache_policy_id            = try(value.default_cache_behavior.cache_policy_id, local.cache_behavior_default.cache_policy_id)
-      origin_request_policy_id   = try(value.default_cache_behavior.origin_request_policy_id, local.cache_behavior_default.origin_request_policy_id)
-      response_headers_policy_id = try(value.default_cache_behavior.response_headers_policy_id, local.cache_behavior_default.response_headers_policy_id)
+      use_forwarded_values     = try(value.default_cache_behavior.use_forwarded_values, local.cache_behavior_default.use_forwarded_values)
+      cache_policy_id          = try(value.default_cache_behavior.cache_policy_id, local.cache_behavior_default.cache_policy_id)
+      origin_request_policy_id = try(value.default_cache_behavior.origin_request_policy_id, local.cache_behavior_default.origin_request_policy_id)
+      # When response_headers_policy_key is set, pass id = null so CloudFront module uses the key lookup
+      response_headers_policy_id  = try(value.default_cache_behavior.response_headers_policy_key, null) != null ? null : try(value.default_cache_behavior.response_headers_policy_id, local.cache_behavior_default.response_headers_policy_id)
+      response_headers_policy_key = try(value.default_cache_behavior.response_headers_policy_key, null)
 
       lambda_function_association = (
         can("${value.default_cache_behavior.lambda_function_association}") ? {
@@ -62,11 +64,12 @@ locals {
         compress        = try(behavior.compress, local.cache_behavior_default.compress)
         query_string    = try(behavior.query_string, local.cache_behavior_default.query_string)
         # Cache key and origin requests
-        use_forwarded_values       = try(behavior.use_forwarded_values, local.cache_behavior_default.use_forwarded_values)
-        cache_policy_id            = try(behavior.cache_policy_id, "658327ea-f89d-4fab-a63d-7e88639e58f6")
-        origin_request_policy_id   = try(behavior.origin_request_policy_id, "acba4595-bd28-49b8-b9fe-13317c0390fa")
-        response_headers_policy_id = try(behavior.response_headers_policy_id, "67f7725c-6f97-4210-82d7-5512b31e9d03")
-
+        use_forwarded_values     = try(behavior.use_forwarded_values, local.cache_behavior_default.use_forwarded_values)
+        cache_policy_id          = try(behavior.cache_policy_id, "658327ea-f89d-4fab-a63d-7e88639e58f6")
+        origin_request_policy_id = try(behavior.origin_request_policy_id, "acba4595-bd28-49b8-b9fe-13317c0390fa")
+        # When response_headers_policy_key is set, pass id = null so CloudFront module uses the key lookup
+        response_headers_policy_id  = try(behavior.response_headers_policy_key, null) != null ? null : try(behavior.response_headers_policy_id, "67f7725c-6f97-4210-82d7-5512b31e9d03")
+        response_headers_policy_key = try(behavior.response_headers_policy_key, null)
         lambda_function_association = (
           can("${behavior.lambda_function_association}") ? {
             for key, value in behavior.lambda_function_association :

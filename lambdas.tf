@@ -4,7 +4,7 @@
 module "static_site_lambdas" {
   for_each = local.static_site_lambdas
   source   = "terraform-aws-modules/lambda/aws"
-  version  = "8.1.2"
+  version  = "8.7.0"
 
   lambda_at_edge = true
 
@@ -15,6 +15,9 @@ module "static_site_lambdas" {
   handler       = try(each.value.handler, "index.handler")
   runtime       = try(each.value.runtime, "nodejs18.x")
   timeout       = try(each.value.timeout, 5)
+
+  ignore_source_code_hash      = true
+  trigger_on_package_timestamp = false
 
   memory_size                       = try(each.value.memory_size, 128)
   ephemeral_storage_size            = try(each.value.ephemeral_storage_size, 512)

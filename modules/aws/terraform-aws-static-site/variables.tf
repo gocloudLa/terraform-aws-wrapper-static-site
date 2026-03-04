@@ -1,22 +1,10 @@
 /*----------------------------------------------------------------------*/
 /* Cloudfront | Variable Definition                                    */
 /*----------------------------------------------------------------------*/
-variable "create_distribution" {
+variable "create" {
   description = "Controls if CloudFront distribution should be created"
   type        = bool
   default     = true
-}
-
-variable "create_origin_access_identity" {
-  description = "Controls if CloudFront origin access identity should be created"
-  type        = bool
-  default     = false
-}
-
-variable "origin_access_identities" {
-  description = "Map of CloudFront origin access identities (value as a comment)"
-  type        = map(string)
-  default     = {}
 }
 
 variable "aliases" {
@@ -44,7 +32,7 @@ variable "enabled" {
 }
 
 variable "http_version" {
-  description = "The maximum HTTP version to support on the distribution. Allowed values are http1.1 and http2. The default is http2."
+  description = "The maximum HTTP version to support on the distribution. Allowed values are http1.1, http2, http2and3, and http3. The default is http2."
   type        = string
   default     = "http2"
 }
@@ -65,6 +53,12 @@ variable "retain_on_delete" {
   description = "Disables the distribution instead of deleting it when destroying the resource through Terraform. If this is set, the distribution needs to be deleted manually afterwards."
   type        = bool
   default     = false
+}
+
+variable "staging" {
+  description = "Whether the distribution is a staging distribution (for blue/green or preview)."
+  type        = bool
+  default     = null
 }
 
 variable "wait_for_deployment" {
@@ -102,11 +96,11 @@ variable "viewer_certificate" {
   type        = any
   default = {
     cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1"
+    minimum_protocol_version       = "TLSv1.2_2025"
   }
 }
 
-variable "geo_restriction" {
+variable "restrictions" {
   description = "The restriction configuration for this distribution (geo_restrictions)"
   type        = any
   default     = {}
@@ -140,6 +134,18 @@ variable "create_monitoring_subscription" {
   description = "If enabled, the resource for monitoring subscription will created."
   type        = bool
   default     = false
+}
+
+variable "response_headers_policies" {
+  description = "Map of CloudFront response headers policies (CORS, security headers, etc.)."
+  type        = any
+  default     = null
+}
+
+variable "cloudfront_functions" {
+  description = "Map of CloudFront Function configurations (key used as default function name if 'name' not specified)."
+  type        = any
+  default     = null
 }
 
 variable "realtime_metrics_subscription_status" {

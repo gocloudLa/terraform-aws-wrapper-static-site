@@ -10,14 +10,24 @@ This module contains the necessary resources to deploy a static website. The mod
 
 ### ✨ Features
 
+- 📋 [Response Headers Policies](#response-headers-policies) - Define CORS, security headers, custom headers and attach them per cache behavior
+
+- 🌐 [DNS Records](#dns-records) - Create Route53 A (alias) records pointing to the CloudFront distribution
+
+- ⚡ [Lambda@Edge](#lambda@edge) - Attach Lambda functions to CloudFront viewer-request or viewer-response
+
+- 🛡️ [WAF (Web ACL)](#waf-(web-acl)) - Attach an AWS WAF Web ACL to the CloudFront distribution
+
+- 📜 [CloudFront access logs](#cloudfront-access-logs) - S3 bucket for CloudFront access logs
+
 
 
 ### 🔗 External Modules
 | Name | Version |
 |------|------:|
-| <a href="https://github.com/terraform-aws-modules/terraform-aws-cloudfront" target="_blank">terraform-aws-modules/cloudfront/aws</a> | 5.0.1 |
-| <a href="https://github.com/terraform-aws-modules/terraform-aws-lambda" target="_blank">terraform-aws-modules/lambda/aws</a> | 8.1.2 |
-| <a href="https://github.com/terraform-aws-modules/terraform-aws-s3-bucket" target="_blank">terraform-aws-modules/s3-bucket/aws</a> | 5.8.2 |
+| <a href="https://github.com/terraform-aws-modules/terraform-aws-cloudfront" target="_blank">terraform-aws-modules/cloudfront/aws</a> | 6.4.0 |
+| <a href="https://github.com/terraform-aws-modules/terraform-aws-lambda" target="_blank">terraform-aws-modules/lambda/aws</a> | 8.7.0 |
+| <a href="https://github.com/terraform-aws-modules/terraform-aws-s3-bucket" target="_blank">terraform-aws-modules/s3-bucket/aws</a> | 5.10.0 |
 
 
 
@@ -74,71 +84,184 @@ static_site_parameters = {
 
 ## 🔧 Additional Features Usage
 
+### Response Headers Policies
+Create multiple CloudFront response headers policies (CORS, security headers, custom or remove headers) and attach them to the default or ordered cache behaviors using `response_headers_policy_key`. Use the same key as in the `response_headers_policies` map.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+response_headers_policies = {
+  cors_policy = {
+    name = "CORSPolicy"
+    comment = "CORS for API"
+    cors_config = {
+      access_control_allow_credentials = true
+      origin_override                  = true
+      access_control_allow_headers     = { items = ["*"] }
+      access_control_allow_methods    = { items = ["GET", "POST", "OPTIONS"] }
+      access_control_allow_origins    = { items = ["https://example.com"] }
+      access_control_max_age_sec      = 3600
+    }
+  }
+  custom_security_headers = {
+    name    = "security-headers"
+    comment = "Security headers"
+    security_headers_config = {
+      content_type_options = { override = true }
+      frame_options       = { frame_option = "SAMEORIGIN", override = true }
+      strict_transport_security = { access_control_max_age_sec = 31536000, override = true, preload = true }
+    }
+  }
+}
+# Attach to a cache behavior:
+default_cache_behavior = { response_headers_policy_key = "custom_security_headers" }
+ordered_cache_behavior = [{ path_pattern = "/api/*", response_headers_policy_key = "cors_policy" }]
+```
+
+
+</details>
+
+
+### DNS Records
+Register A records (alias to CloudFront) in Route53 hosted zones. Use key `""` for subdomain matching the site name, or `"_null_"` for the zone apex (e.g. example.com).
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+dns_records = {
+  "" = {
+    zone_name    = local.zone_public
+    private_zone = false
+  }
+  # Apex record (e.g. https://example.com)
+  "_null_" = {
+    zone_name    = local.zone_public
+    private_zone = false
+  }
+}
+```
+
+
+</details>
+
+
+### Lambda@Edge
+Define Lambdas in the module and associate them to the default or ordered cache behaviors via `lambda_function_association`, with optional `include_body` for viewer-request.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+lambdas = {
+  "authentication" = {}
+}
+default_cache_behavior = {
+  lambda_function_association = {
+    "viewer-request" = {
+      lambda_name  = "authentication"
+      include_body = false
+    }
+  }
+}
+```
+
+
+</details>
+
+
+### WAF (Web ACL)
+Associate a WAF Web ACL to protect the static site. For WAFv2 use the ARN of the Web ACL. The Web ACL must exist in the CloudFront (global) scope.
+
+
+<details><summary>Configuration Code</summary>
+
+```hcl
+web_acl_id = data.aws_wafv2_web_acl.cloudfront.arn
+```
+
+
+</details>
+
+
+### CloudFront access logs
+The module creates an S3 bucket for CloudFront access logs by default. Configure `create_log_bucket` and optional overrides via `logging_config` if you need a custom destination.
+
+
+
 
 
 ## 📑 Inputs
-| Name                                  | Description                                                      | Type     | Default                                                                                                                                 | Required |
-| ------------------------------------- | ---------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| bucket                                | Bucket name for the S3 instance                                  | `string` | `"${local.common_name}-${each.key}"`                                                                                                    | no       |
-| create_bucket                         | Whether to create the S3 bucket                                  | `bool`   | `true`                                                                                                                                  | no       |
-| acceleration_status                   | Bucket acceleration status                                       | `string` | `null`                                                                                                                                  | no       |
-| acl                                   | Access control list (ACL)                                        | `string` | `null`                                                                                                                                  | no       |
-| attach_deny_insecure_transport_policy | Attach a policy to deny insecure transport                       | `bool`   | `false`                                                                                                                                 | no       |
-| attach_policy                         | Attach a custom policy to the S3 bucket                          | `bool`   | `false`                                                                                                                                 | no       |
-| attach_public_policy                  | Attach a public policy to the S3 bucket                          | `bool`   | `true`                                                                                                                                  | no       |
-| attach_require_latest_tls_policy      | Attach a policy requiring the latest TLS version                 | `bool`   | `false`                                                                                                                                 | no       |
-| block_public_acls                     | Block public ACLs on the bucket                                  | `bool`   | `true`                                                                                                                                  | no       |
-| block_public_policy                   | Block public policies on the bucket                              | `bool`   | `true`                                                                                                                                  | no       |
-| control_object_ownership              | Enable control over object ownership                             | `bool`   | `false`                                                                                                                                 | no       |
-| cors_rule                             | CORS rule for the bucket                                         | `list`   | `[]`                                                                                                                                    | no       |
-| expected_bucket_owner                 | Expected bucket owner ID                                         | `string` | `null`                                                                                                                                  | no       |
-| force_destroy                         | Force bucket destruction on Terraform destroy                    | `bool`   | `true`                                                                                                                                  | no       |
-| ignore_public_acls                    | Ignore public ACLs for the bucket                                | `bool`   | `true`                                                                                                                                  | no       |
-| intelligent_tiering                   | Intelligent tiering configuration                                | `map`    | `{}`                                                                                                                                    | no       |
-| lifecycle_rule                        | Lifecycle rules for the bucket                                   | `list`   | `[]`                                                                                                                                    | no       |
-| logging                               | Logging configuration for the S3 bucket                          | `map`    | `{}`                                                                                                                                    | no       |
-| metric_configuration                  | Metrics configuration for the bucket                             | `list`   | `[]`                                                                                                                                    | no       |
-| object_lock_configuration             | Object lock configuration                                        | `map`    | `{}`                                                                                                                                    | no       |
-| object_lock_enabled                   | Enable object lock for the bucket                                | `bool`   | `false`                                                                                                                                 | no       |
-| object_ownership                      | Object ownership setting                                         | `string` | `"ObjectWriter"`                                                                                                                        | no       |
-| policy                                | Custom policy for the bucket                                     | `string` | `null`                                                                                                                                  | no       |
-| replication_configuration             | Replication configuration for the bucket                         | `map`    | `{}`                                                                                                                                    | no       |
-| request_payer                         | Request payer for bucket transactions                            | `string` | `null`                                                                                                                                  | no       |
-| server_side_encryption_configuration  | Server-side encryption configuration for the bucket              | `map`    | `{}`                                                                                                                                    | no       |
-| versioning                            | Versioning configuration for the bucket                          | `map`    | `{}`                                                                                                                                    | no       |
-| website                               | Website hosting configuration for the bucket                     | `map`    | `{}`                                                                                                                                    | no       |
-| create_log_bucket                     | Whether to create a log bucket                                   | `bool`   | `true`                                                                                                                                  | no       |
-| create_distribution                   | Whether to create a CloudFront distribution                      | `bool`   | `true`                                                                                                                                  | no       |
-| create_origin_access_identity         | Whether to create an Origin Access Identity for CloudFront       | `bool`   | `true`                                                                                                                                  | no       |
-| origin_access_identities              | Origin access identities for the CloudFront distribution         | `map`    | `{"${local.common_name}-${each.key}": "Application S3 Bucket"}`                                                                         | no       |
-| aliases                               | Aliases for the CloudFront distribution                          | `list`   | `null`                                                                                                                                  | no       |
-| comment                               | Comment for the CloudFront distribution                          | `string` | `"${local.common_name}-${each.key}"`                                                                                                    | no       |
-| default_root_object                   | Default root object for the CloudFront distribution              | `string` | `"index.html"`                                                                                                                          | no       |
-| enabled                               | Enable the CloudFront distribution                               | `bool`   | `true`                                                                                                                                  | no       |
-| http_version                          | HTTP version for the CloudFront distribution                     | `string` | `"http2"`                                                                                                                               | no       |
-| is_ipv6_enabled                       | Enable IPv6 for the CloudFront distribution                      | `bool`   | `true`                                                                                                                                  | no       |
-| price_class                           | Price class for the CloudFront distribution                      | `string` | `"PriceClass_100"`                                                                                                                      | no       |
-| retain_on_delete                      | Retain the CloudFront distribution on resource deletion          | `bool`   | `false`                                                                                                                                 | no       |
-| wait_for_deployment                   | Wait for CloudFront distribution deployment                      | `bool`   | `false`                                                                                                                                 | no       |
-| web_acl_id                            | Web ACL ID for the CloudFront distribution                       | `string` | `null`                                                                                                                                  | no       |
-| origin                                | Origin settings for the CloudFront distribution                  | `map`    | `{}`                                                                                                                                    | no       |
-| origin_group                          | Origin group settings for the CloudFront distribution            | `map`    | `{}`                                                                                                                                    | no       |
-| viewer_certificate                    | Viewer certificate configuration for the CloudFront distribution | `map`    | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2019"}` | no       |
-| geo_restriction                       | Geo restriction settings for the CloudFront distribution         | `map`    | `{}`                                                                                                                                    | no       |
-| logging_config                        | Logging configuration for the CloudFront distribution            | `map`    | `{}`                                                                                                                                    | no       |
-| custom_error_response                 | Custom error responses for the CloudFront distribution           | `map`    | `{}`                                                                                                                                    | no       |
-| default_cache_behavior                | Default cache behavior settings for the CloudFront distribution  | `map`    | `local.default_cache_behavior[each.key]`                                                                                                | no       |
-| ordered_cache_behavior                | Ordered cache behavior settings for the CloudFront distribution  | `map`    | `local.ordered_cache_behavior[each.key]`                                                                                                | no       |
-| create_monitoring_subscription        | Whether to create a monitoring subscription for CloudFront       | `bool`   | `true`                                                                                                                                  | no       |
-| realtime_metrics_subscription_status  | Status of real-time metrics subscription for CloudFront          | `string` | `"Enabled"`                                                                                                                             | no       |
-| acm_certificate_arn                   | ACM certificate ARN for the CloudFront distribution              | `string` | `null`                                                                                                                                  | no       |
-| enable_dashboard                      | Whether to enable a dashboard for CloudFront                     | `bool`   | `false`                                                                                                                                 | no       |
-| tags                                  | A map of tags to assign to resources.                            | `map`    | `{}`                                                                                                                                    | no       |
+| Name                                  | Description                                                                         | Type     | Default                                                                                                                                 | Required |
+| ------------------------------------- | ----------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| bucket                                | Bucket name for the S3 instance                                                     | `string` | `"${local.common_name}-${each.key}"`                                                                                                    | no       |
+| create_bucket                         | Whether to create the S3 bucket                                                     | `bool`   | `true`                                                                                                                                  | no       |
+| acceleration_status                   | Bucket acceleration status                                                          | `string` | `null`                                                                                                                                  | no       |
+| acl                                   | Access control list (ACL)                                                           | `string` | `null`                                                                                                                                  | no       |
+| attach_deny_insecure_transport_policy | Attach a policy to deny insecure transport                                          | `bool`   | `false`                                                                                                                                 | no       |
+| attach_policy                         | Attach a custom policy to the S3 bucket                                             | `bool`   | `false`                                                                                                                                 | no       |
+| attach_public_policy                  | Attach a public policy to the S3 bucket                                             | `bool`   | `true`                                                                                                                                  | no       |
+| attach_require_latest_tls_policy      | Attach a policy requiring the latest TLS version                                    | `bool`   | `false`                                                                                                                                 | no       |
+| block_public_acls                     | Block public ACLs on the bucket                                                     | `bool`   | `true`                                                                                                                                  | no       |
+| block_public_policy                   | Block public policies on the bucket                                                 | `bool`   | `true`                                                                                                                                  | no       |
+| control_object_ownership              | Enable control over object ownership                                                | `bool`   | `false`                                                                                                                                 | no       |
+| cors_rule                             | CORS rule for the bucket                                                            | `list`   | `[]`                                                                                                                                    | no       |
+| expected_bucket_owner                 | Expected bucket owner ID                                                            | `string` | `null`                                                                                                                                  | no       |
+| force_destroy                         | Force bucket destruction on Terraform destroy                                       | `bool`   | `true`                                                                                                                                  | no       |
+| ignore_public_acls                    | Ignore public ACLs for the bucket                                                   | `bool`   | `true`                                                                                                                                  | no       |
+| intelligent_tiering                   | Intelligent tiering configuration                                                   | `map`    | `{}`                                                                                                                                    | no       |
+| lifecycle_rule                        | Lifecycle rules for the bucket                                                      | `list`   | `[]`                                                                                                                                    | no       |
+| logging                               | Logging configuration for the S3 bucket                                             | `map`    | `{}`                                                                                                                                    | no       |
+| metric_configuration                  | Metrics configuration for the bucket                                                | `list`   | `[]`                                                                                                                                    | no       |
+| object_lock_configuration             | Object lock configuration                                                           | `map`    | `{}`                                                                                                                                    | no       |
+| object_lock_enabled                   | Enable object lock for the bucket                                                   | `bool`   | `false`                                                                                                                                 | no       |
+| object_ownership                      | Object ownership setting                                                            | `string` | `"ObjectWriter"`                                                                                                                        | no       |
+| policy                                | Custom policy for the bucket                                                        | `string` | `null`                                                                                                                                  | no       |
+| replication_configuration             | Replication configuration for the bucket                                            | `map`    | `{}`                                                                                                                                    | no       |
+| request_payer                         | Request payer for bucket transactions                                               | `string` | `null`                                                                                                                                  | no       |
+| server_side_encryption_configuration  | Server-side encryption configuration for the bucket                                 | `map`    | `{}`                                                                                                                                    | no       |
+| versioning                            | Versioning configuration for the bucket                                             | `map`    | `{}`                                                                                                                                    | no       |
+| website                               | Website hosting configuration for the bucket                                        | `map`    | `{}`                                                                                                                                    | no       |
+| create_log_bucket                     | Whether to create a log bucket                                                      | `bool`   | `true`                                                                                                                                  | no       |
+| create                                | Whether to create a CloudFront distribution                                         | `bool`   | `true`                                                                                                                                  | no       |
+| aliases                               | Aliases for the CloudFront distribution                                             | `list`   | `null`                                                                                                                                  | no       |
+| comment                               | Comment for the CloudFront distribution                                             | `string` | `"${local.common_name}-${each.key}"`                                                                                                    | no       |
+| default_root_object                   | Default root object for the CloudFront distribution                                 | `string` | `"index.html"`                                                                                                                          | no       |
+| enabled                               | Enable the CloudFront distribution                                                  | `bool`   | `true`                                                                                                                                  | no       |
+| http_version                          | HTTP version for the CloudFront distribution                                        | `string` | `"http2"`                                                                                                                               | no       |
+| is_ipv6_enabled                       | Enable IPv6 for the CloudFront distribution                                         | `bool`   | `true`                                                                                                                                  | no       |
+| price_class                           | Price class for the CloudFront distribution                                         | `string` | `"PriceClass_100"`                                                                                                                      | no       |
+| retain_on_delete                      | Retain the CloudFront distribution on resource deletion                             | `bool`   | `false`                                                                                                                                 | no       |
+| staging                               | Whether the CloudFront distribution is a staging distribution (blue/green, preview) | `bool`   | `null`                                                                                                                                  | no       |
+| wait_for_deployment                   | Wait for CloudFront distribution deployment                                         | `bool`   | `false`                                                                                                                                 | no       |
+| web_acl_id                            | Web ACL ID for the CloudFront distribution                                          | `string` | `null`                                                                                                                                  | no       |
+| origin                                | Origin settings for the CloudFront distribution                                     | `map`    | `{}`                                                                                                                                    | no       |
+| origin_group                          | Origin group settings for the CloudFront distribution                               | `map`    | `null`                                                                                                                                  | no       |
+| viewer_certificate                    | Viewer certificate configuration for the CloudFront distribution                    | `map`    | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2025"}` | no       |
+| restrictions                          | Restriction configuration for the CloudFront distribution                           | `map`    | `{"geo_restriction":{"restriction_type":"none","locations":[]}}`                                                                        | no       |
+| response_headers_policies             | Map of CloudFront response headers policies (CORS, security headers, etc.)          | `any`    | `null`                                                                                                                                  | no       |
+| cloudfront_functions                  | Map of CloudFront Function configurations (redirects, edge logic)                   | `any`    | `null`                                                                                                                                  | no       |
+| logging_config                        | Logging configuration for the CloudFront distribution                               | `map`    | `{}`                                                                                                                                    | no       |
+| custom_error_response                 | Custom error responses for the CloudFront distribution                              | `map`    | `{}`                                                                                                                                    | no       |
+| default_cache_behavior                | Default cache behavior settings for the CloudFront distribution                     | `map`    | `local.default_cache_behavior[each.key]`                                                                                                | no       |
+| ordered_cache_behavior                | Ordered cache behavior settings for the CloudFront distribution                     | `map`    | `local.ordered_cache_behavior[each.key]`                                                                                                | no       |
+| create_monitoring_subscription        | Whether to create a monitoring subscription for CloudFront                          | `bool`   | `true`                                                                                                                                  | no       |
+| realtime_metrics_subscription_status  | Status of real-time metrics subscription for CloudFront                             | `string` | `"Enabled"`                                                                                                                             | no       |
+| acm_certificate_arn                   | ACM certificate ARN for the CloudFront distribution                                 | `string` | `null`                                                                                                                                  | no       |
+| enable_dashboard                      | Whether to enable a dashboard for CloudFront                                        | `bool`   | `false`                                                                                                                                 | no       |
+| tags                                  | A map of tags to assign to resources.                                               | `map`    | `{}`                                                                                                                                    | no       |
 
 
 
 
 
+
+
+## ⚠️ Important Notes
+- CloudFront access to the S3 origin now uses Origin Access Control (OAC) instead of Origin Access Identity (OAI).
+- The S3 bucket policy for static content now authorizes `cloudfront.amazonaws.com` with `AWS:SourceArn` set to the CloudFront distribution ARN.
+- CloudFront geo restrictions are configured through the `restrictions` input (using the nested `geo_restriction` block).
 
 
 

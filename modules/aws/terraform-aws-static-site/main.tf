@@ -1,41 +1,53 @@
 module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
-  version = "5.0.1"
+  version = "6.4.0"
 
+  create              = var.create
   aliases             = var.aliases
   comment             = var.comment
   enabled             = var.enabled
-  is_ipv6_enabled     = var.is_ipv6_enabled     //True
-  price_class         = var.price_class         //"PriceClass_100"
-  retain_on_delete    = var.retain_on_delete    //false
-  wait_for_deployment = var.wait_for_deployment //false
+  http_version        = var.http_version
+  is_ipv6_enabled     = var.is_ipv6_enabled
+  price_class         = var.price_class
+  retain_on_delete    = var.retain_on_delete
+  staging             = var.staging
+  wait_for_deployment = var.wait_for_deployment
   web_acl_id          = var.web_acl_id
 
   # When you enable additional metrics for a distribution, CloudFront sends up to 8 metrics to CloudWatch in the US East (N. Virginia) Region.
   # This rate is charged only once per month, per metric (up to 8 metrics per distribution).
-  create_monitoring_subscription = var.create_monitoring_subscription //true
-
-  create_origin_access_identity = var.create_origin_access_identity //true
+  create_monitoring_subscription       = var.create_monitoring_subscription
+  realtime_metrics_subscription_status = var.realtime_metrics_subscription_status
 
   default_root_object = var.default_root_object
 
-  custom_error_response = var.custom_error_response
-  viewer_certificate    = var.viewer_certificate
-  geo_restriction       = var.geo_restriction
+  custom_error_response     = var.custom_error_response
+  viewer_certificate        = var.viewer_certificate
+  restrictions              = var.restrictions
+  response_headers_policies = var.response_headers_policies
+  cloudfront_functions      = var.cloudfront_functions
+  origin_group              = var.origin_group
 
-  origin_access_identities = var.origin_access_identities
 
   logging_config = {
     bucket = module.cloudfront_log_bucket.s3_bucket_bucket_domain_name
     prefix = "cloudfront"
   }
 
+  origin_access_control = {
+    "${var.bucket}-origin-access-control" = {
+      description      = "Origin Access Control for ${var.bucket}"
+      name             = "${var.bucket}-origin-access-control"
+      origin_type      = "s3"
+      signing_behavior = "always"
+      signing_protocol = "sigv4"
+    }
+  }
+
   origin = {
     "${var.bucket}" = {
-      domain_name = module.app_bucket.s3_bucket_bucket_regional_domain_name
-      s3_origin_config = {
-        origin_access_identity = var.bucket
-      }
+      domain_name               = module.app_bucket.s3_bucket_bucket_regional_domain_name
+      origin_access_control_key = "${var.bucket}-origin-access-control"
     }
   }
 
@@ -52,7 +64,7 @@ module "cloudfront" {
 
 module "app_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.8.2"
+  version = "5.10.0"
 
   bucket               = var.bucket
   force_destroy        = var.force_destroy
@@ -72,7 +84,7 @@ module "app_bucket" {
 
 module "cloudfront_log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "5.8.2"
+  version = "5.10.0"
 
   create_bucket           = var.create_log_bucket
   bucket                  = "${var.bucket}-cloudfront-logs"

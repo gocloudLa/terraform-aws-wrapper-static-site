@@ -59,8 +59,105 @@ quick_start: |
     }
   }
   ```
-features: []
-important_notes: ""
+features:
+  - icon: 📋
+    title: Response Headers Policies
+    short_description: Define CORS, security headers, custom headers and attach them per cache behavior
+    long_description: |
+      Create multiple CloudFront response headers policies (CORS, security headers, custom or remove headers) and attach them to the default or ordered cache behaviors using `response_headers_policy_key`. Use the same key as in the `response_headers_policies` map.
+    examples:
+      - title: Configuration Code
+        code: |
+          ```hcl
+          response_headers_policies = {
+            cors_policy = {
+              name = "CORSPolicy"
+              comment = "CORS for API"
+              cors_config = {
+                access_control_allow_credentials = true
+                origin_override                  = true
+                access_control_allow_headers     = { items = ["*"] }
+                access_control_allow_methods    = { items = ["GET", "POST", "OPTIONS"] }
+                access_control_allow_origins    = { items = ["https://example.com"] }
+                access_control_max_age_sec      = 3600
+              }
+            }
+            custom_security_headers = {
+              name    = "security-headers"
+              comment = "Security headers"
+              security_headers_config = {
+                content_type_options = { override = true }
+                frame_options       = { frame_option = "SAMEORIGIN", override = true }
+                strict_transport_security = { access_control_max_age_sec = 31536000, override = true, preload = true }
+              }
+            }
+          }
+          # Attach to a cache behavior:
+          default_cache_behavior = { response_headers_policy_key = "custom_security_headers" }
+          ordered_cache_behavior = [{ path_pattern = "/api/*", response_headers_policy_key = "cors_policy" }]
+          ```
+  - icon: 🌐
+    title: DNS Records
+    short_description: Create Route53 A (alias) records pointing to the CloudFront distribution
+    long_description: |
+      Register A records (alias to CloudFront) in Route53 hosted zones. Use key `""` for subdomain matching the site name, or `"_null_"` for the zone apex (e.g. example.com).
+    examples:
+      - title: Configuration Code
+        code: |
+          ```hcl
+          dns_records = {
+            "" = {
+              zone_name    = local.zone_public
+              private_zone = false
+            }
+            # Apex record (e.g. https://example.com)
+            "_null_" = {
+              zone_name    = local.zone_public
+              private_zone = false
+            }
+          }
+          ```
+  - icon: ⚡
+    title: Lambda@Edge
+    short_description: Attach Lambda functions to CloudFront viewer-request or viewer-response
+    long_description: |
+      Define Lambdas in the module and associate them to the default or ordered cache behaviors via `lambda_function_association`, with optional `include_body` for viewer-request.
+    examples:
+      - title: Configuration Code
+        code: |
+          ```hcl
+          lambdas = {
+            "authentication" = {}
+          }
+          default_cache_behavior = {
+            lambda_function_association = {
+              "viewer-request" = {
+                lambda_name  = "authentication"
+                include_body = false
+              }
+            }
+          }
+          ```
+  - icon: 🛡️
+    title: WAF (Web ACL)
+    short_description: Attach an AWS WAF Web ACL to the CloudFront distribution
+    long_description: |
+      Associate a WAF Web ACL to protect the static site. For WAFv2 use the ARN of the Web ACL. The Web ACL must exist in the CloudFront (global) scope.
+    examples:
+      - title: Configuration Code
+        code: |
+          ```hcl
+          web_acl_id = data.aws_wafv2_web_acl.cloudfront.arn
+          ```
+  - icon: 📜
+    title: CloudFront access logs
+    short_description: S3 bucket for CloudFront access logs
+    long_description: |
+      The module creates an S3 bucket for CloudFront access logs by default. Configure `create_log_bucket` and optional overrides via `logging_config` if you need a custom destination.
+important_notes: |
+  - CloudFront access to the S3 origin now uses Origin Access Control (OAC) instead of Origin Access Identity (OAI).
+  - The S3 bucket policy for static content now authorizes `cloudfront.amazonaws.com` with `AWS:SourceArn` set to the CloudFront distribution ARN.
+  - CloudFront geo restrictions are configured through the `restrictions` input (using the nested `geo_restriction` block).
 input_table: |
   | bucket | Bucket name for the S3 instance | `string` | `"${local.common_name}-${each.key}"` | no |
   | create_bucket | Whether to create the S3 bucket | `bool` | `true` | no |
@@ -91,9 +188,7 @@ input_table: |
   | versioning | Versioning configuration for the bucket | `map` | `{}` | no |
   | website | Website hosting configuration for the bucket | `map` | `{}` | no |
   | create_log_bucket | Whether to create a log bucket | `bool` | `true` | no |
-  | create_distribution | Whether to create a CloudFront distribution | `bool` | `true` | no |
-  | create_origin_access_identity | Whether to create an Origin Access Identity for CloudFront | `bool` | `true` | no |
-  | origin_access_identities | Origin access identities for the CloudFront distribution | `map` | `{"${local.common_name}-${each.key}": "Application S3 Bucket"}` | no |
+  | create | Whether to create a CloudFront distribution | `bool` | `true` | no |
   | aliases | Aliases for the CloudFront distribution | `list` | `null` | no |
   | comment | Comment for the CloudFront distribution | `string` | `"${local.common_name}-${each.key}"` | no |
   | default_root_object | Default root object for the CloudFront distribution | `string` | `"index.html"` | no |
@@ -102,12 +197,15 @@ input_table: |
   | is_ipv6_enabled | Enable IPv6 for the CloudFront distribution | `bool` | `true` | no |
   | price_class | Price class for the CloudFront distribution | `string` | `"PriceClass_100"` | no |
   | retain_on_delete | Retain the CloudFront distribution on resource deletion | `bool` | `false` | no |
+  | staging | Whether the CloudFront distribution is a staging distribution (blue/green, preview) | `bool` | `null` | no |
   | wait_for_deployment | Wait for CloudFront distribution deployment | `bool` | `false` | no |
   | web_acl_id | Web ACL ID for the CloudFront distribution | `string` | `null` | no |
   | origin | Origin settings for the CloudFront distribution | `map` | `{}` | no |
-  | origin_group | Origin group settings for the CloudFront distribution | `map` | `{}` | no |
-  | viewer_certificate | Viewer certificate configuration for the CloudFront distribution | `map` | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2019"}` | no |
-  | geo_restriction | Geo restriction settings for the CloudFront distribution | `map` | `{}` | no |
+  | origin_group | Origin group settings for the CloudFront distribution | `map` | `null` | no |
+  | viewer_certificate | Viewer certificate configuration for the CloudFront distribution | `map` | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2025"}` | no |
+  | restrictions | Restriction configuration for the CloudFront distribution | `map` | `{"geo_restriction":{"restriction_type":"none","locations":[]}}` | no |
+  | response_headers_policies | Map of CloudFront response headers policies (CORS, security headers, etc.) | `any` | `null` | no |
+  | cloudfront_functions | Map of CloudFront Function configurations (redirects, edge logic) | `any` | `null` | no |
   | logging_config | Logging configuration for the CloudFront distribution | `map` | `{}` | no |
   | custom_error_response | Custom error responses for the CloudFront distribution | `map` | `{}` | no |
   | default_cache_behavior | Default cache behavior settings for the CloudFront distribution | `map` | `local.default_cache_behavior[each.key]` | no |
