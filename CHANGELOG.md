@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.3...v1.0.4) (2026-03-08)
+
+
+### Bug Fixes
+
+* **custom_error_response:** change default value to null ([#12](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/issues/12)) ([0def15c](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/commit/0def15c7365ff63cc7f2aebef90d9a05dde6e2af))
+
 ## [1.0.3](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.2...v1.0.3) (2026-03-04)
 
 
