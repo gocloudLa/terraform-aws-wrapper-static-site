@@ -63,7 +63,7 @@ module "static-site" {
     }
   })
   logging_config         = try(each.value.logging_config, var.static_site_defaults.logging_config, {})
-  custom_error_response  = try(each.value.custom_error_response, var.static_site_defaults.custom_error_response, {})
+  custom_error_response  = try(each.value.custom_error_response, var.static_site_defaults.custom_error_response, null)
   default_cache_behavior = local.default_cache_behavior[each.key]
   ordered_cache_behavior = local.ordered_cache_behavior[each.key]
 
