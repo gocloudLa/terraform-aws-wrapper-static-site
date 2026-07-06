@@ -54,7 +54,7 @@ module "static-site" {
   origin_group                   = try(each.value.origin_group, var.static_site_defaults.origin_group, {})
   response_headers_policies      = try(each.value.response_headers_policies, var.static_site_defaults.response_headers_policies, null)
   cloudfront_functions           = try(each.value.cloudfront_functions, var.static_site_defaults.cloudfront_functions, null)
-  viewer_certificate             = try(each.value.viewer_certificate, var.static_site_defaults.viewer_certificate, {
+  viewer_certificate = try(each.value.viewer_certificate, var.static_site_defaults.viewer_certificate, {
     acm_certificate_arn      = each.value.acm_certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2025"
