@@ -201,6 +201,8 @@ input_table: |
   | wait_for_deployment | Wait for CloudFront distribution deployment | `bool` | `false` | no |
   | web_acl_id | Web ACL ID for the CloudFront distribution | `string` | `null` | no |
   | origin | Origin settings for the CloudFront distribution | `map` | `{}` | no |
+  | origin_access_control_name | Name of the Origin Access Control for the CloudFront distribution. | `string` | `null` | no |
+  | origin_access_control_key_name | Name of the Origin Access Control signing key for the CloudFront distribution. | `string` | `null` | no |
   | origin_group | Origin group settings for the CloudFront distribution | `map` | `null` | no |
   | viewer_certificate | Viewer certificate configuration for the CloudFront distribution | `map` | `{"acm_certificate_arn": each.value.acm_certificate_arn, "ssl_support_method": "sni-only", "minimum_protocol_version": "TLSv1.2_2025"}` | no |
   | restrictions | Restriction configuration for the CloudFront distribution | `map` | `{"geo_restriction":{"restriction_type":"none","locations":[]}}` | no |
