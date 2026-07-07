@@ -158,18 +158,6 @@ variable "acm_certificate_arn" {
   type = string
 }
 
-variable "origin_access_control_name" {
-  description = "Name of the Origin Access Control for the CloudFront distribution."
-  type        = string
-  default     = null
-}
-
-variable "origin_access_control_key_name" {
-  description = "Name of the Origin Access Control signing key for the CloudFront distribution."
-  type        = string
-  default     = null
-}
-
 /*----------------------------------------------------------------------*/
 /* Bucket | Variable Definition                                    */
 /*----------------------------------------------------------------------*/
