@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.4...v1.0.5) (2026-07-07)
+
+
+### Bug Fixes
+
+* **cloudfront:** change origin access name ([#21](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/issues/21)) ([370bef0](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/commit/370bef07cf60fef4e80841824fab9a2ebbdeb69f))
+
 ## [1.0.4](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.3...v1.0.4) (2026-03-08)
 
 
