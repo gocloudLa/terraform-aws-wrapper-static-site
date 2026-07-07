@@ -37,7 +37,7 @@ module "cloudfront" {
   origin_access_control = {
     "${var.bucket}-origin-access-control" = {
       description      = "Origin Access Control for ${var.bucket}"
-      name             = "${var.bucket}-origin-access-control"
+      name             = "${var.bucket}"
       origin_type      = "s3"
       signing_behavior = "always"
       signing_protocol = "sigv4"
@@ -47,7 +47,7 @@ module "cloudfront" {
   origin = {
     "${var.bucket}" = {
       domain_name               = module.app_bucket.s3_bucket_bucket_regional_domain_name
-      origin_access_control_key = "${var.bucket}-origin-access-control"
+      origin_access_control_key = "${var.bucket}"
     }
   }
 
