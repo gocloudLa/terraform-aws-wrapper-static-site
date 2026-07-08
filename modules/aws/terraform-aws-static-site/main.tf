@@ -47,7 +47,7 @@ module "cloudfront" {
   origin = {
     "${var.bucket}" = {
       domain_name               = module.app_bucket.s3_bucket_bucket_regional_domain_name
-      origin_access_control_key = "${var.bucket}"
+      origin_access_control_key = "${var.bucket}-origin-access-control"
     }
   }
 
