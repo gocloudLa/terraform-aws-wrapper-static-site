@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.5...v1.0.6) (2026-07-09)
+
+
+### Bug Fixes
+
+* **cloudfront:** change OAC key ([#23](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/issues/23)) ([f5930f8](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/commit/f5930f87e2726a9bff6eb8008f59023e3a99e17d))
+
 ## [1.0.5](https://github.com/gocloudLa/terraform-aws-wrapper-static-site/compare/v1.0.4...v1.0.5) (2026-07-07)
 
 
