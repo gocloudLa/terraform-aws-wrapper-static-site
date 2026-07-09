@@ -35,7 +35,7 @@ module "cloudfront" {
   }
 
   origin_access_control = {
-    "${var.bucket}-origin-access-control" = {
+    "${var.bucket}" = {
       description      = "Origin Access Control for ${var.bucket}"
       name             = "${var.bucket}"
       origin_type      = "s3"
